@@ -1,6 +1,5 @@
 .*
 *.key
-data/
 output/
 model/
 build/
