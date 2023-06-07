@@ -11,7 +11,3 @@ Tweet::Tweet(int i, std::string k, std::string l, std::string t) :id{i}, keyword
 		if(token->length() > 1)
 			clean_text.push_back(*token);
 }
-
-size_t Tweet::size() {
-	return clean_text.size();
-}

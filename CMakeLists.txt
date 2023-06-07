@@ -13,7 +13,7 @@ set(CMAKE_CXX_FLAGS "-msse3 -fopenmp -Wall -Wextra -Wno-unused-parameter -pthrea
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0")
 
-set(SOURCE_FILES main.cpp tweet_reader.cpp tweet.cpp)
+set(SOURCE_FILES main.cpp tweet_reader.cpp tweet.cpp glove_reader.cpp vocabulary.cpp tweet_dataset.cpp rnn.cpp)
 
 set(REQUIRED_LIBS "stdc++fs")
 list(APPEND REQUIRED_LIBS ${TORCH_LIBRARIES})
