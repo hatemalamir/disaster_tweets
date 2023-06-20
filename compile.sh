@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 cmake -DCMAKE_PREFIX_PATH=../../../lib/libtorch -H. -Bbuild
 cd build
 make disaster-tweets

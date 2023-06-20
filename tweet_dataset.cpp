@@ -9,10 +9,10 @@ TweetSample TweetDataset::get(size_t index) {
 		target = torch::tensor(1.f, torch::dtype(torch::kFloat).device(device_).requires_grad(false));
 	}
 	else {
-		tweet = &reader_->GetNeg(index - reader_->GetNegSize());
+		tweet = &reader_->GetNeg(index - reader_->GetPosSize());
 		target = torch::tensor(0.f, torch::dtype(torch::kFloat).device(device_).requires_grad(false));
 	}
-	
+
 	// text encoding
 	std::vector<int64_t> indices(reader_->GetMaxSize());
 	size_t i = 0;

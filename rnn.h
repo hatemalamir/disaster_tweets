@@ -2,6 +2,7 @@
 #define RNN_H
 
 #include <torch/torch.h>
+
 class SentimentRNNImpl : public torch::nn::Module {
 	public:
 		SentimentRNNImpl(

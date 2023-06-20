@@ -34,30 +34,19 @@ SentimentRNNImpl::SentimentRNNImpl(
 torch::Tensor SentimentRNNImpl::forward(const torch::Tensor& text, const at::Tensor& length) {
 	auto embedded = dropout_(torch::embedding(embeddings_weights_, text, pad_idx_));
 
-	// torch::Tensor packed_text, packed_length;
-	// std::tie(packed_text, packed_length) = torch::_pack_padded_sequence(embedded, length.squeeze(1), false);
-	torch::nn::utils::rnn::PackedSequence packed_seq = torch::nn::utils::rnn::pack_padded_sequence(
-		embedded,
-		length.squeeze(1),
-		false
-	);
+	auto rnn_out = rnn_->forward(embedded);
 
-	// auto rnn_out = rnn_->forward(packed_text, packed_length);
-	auto rnn_out = rnn_->forward_with_packed_input(packed_seq);
+	auto hidden_state = std::get<0>(rnn_out);
+	auto hidden_state_size = hidden_state.sizes();
 
-	// auto hidden_state = rnn_out.state.narrow(0, 0, 1);
-	auto hidden_state = std::get<0>(rnn_out).data().narrow(0, 0, 1);
-	hidden_state.squeeze(0);
+	int64_t sequence_len = hidden_state_size[0];
+	auto last_hidden_state = hidden_state.narrow(0, sequence_len - 2, 1).squeeze(0);
 
-	auto last_index = rnn_->options.num_layers() - 2;
-	hidden_state = at::cat({
-		hidden_state.narrow(0, last_index, 1).squeeze(0),
-		hidden_state.narrow(0, last_index + 1, 1).squeeze(0)
-	}, 1);
+	auto hidden = dropout_(last_hidden_state);
 
-	auto hidden = dropout_(hidden_state);
+	auto output = fc_(hidden);
 
-	return fc_(hidden);
+	return output;
 }
 
 void SentimentRNNImpl::SetPretrainedEmbeddings(const at::Tensor& weights) {

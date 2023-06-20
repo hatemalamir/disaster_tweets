@@ -13,6 +13,8 @@ TweetReader::TweetReader(const std::string& root_path) {
 	if(std::filesystem::exists(file_path)) {
 		auto samples = std::async(std::launch::async, [&](){ReadFile(file_path, pos_samples_, neg_samples_);});
 		samples.get();
+		pos_size_ = pos_samples_.size();
+		neg_size_ = neg_samples_.size();
 	}
 	else {
 		throw std::invalid_argument(">>> TweetReader: Incorrect path");
