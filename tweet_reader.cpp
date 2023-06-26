@@ -17,7 +17,7 @@ TweetReader::TweetReader(const std::string& root_path) {
 		neg_size_ = neg_samples_.size();
 	}
 	else {
-		throw std::invalid_argument(">>> TweetReader: Incorrect path");
+		throw std::invalid_argument(">>> TweetReader: Incorrect path " + root_path);
 	}
 }
 
@@ -27,9 +27,9 @@ bool  read_row_helper(std::index_sequence<Idx...>, T& row, R& reader) {
 }
 
 template <std::size_t... Idx, typename R>
-std::unique_ptr<Tweet> fill_values(std::index_sequence<Idx...>, R& row) {
-	std::unique_ptr<Tweet> tweet{new Tweet(std::get<Idx>(row)...)};
-	return std::move(tweet);
+Tweet fill_values(std::index_sequence<Idx...>, R& row) {
+	Tweet tweet{std::get<Idx>(row)...};
+	return tweet;
 }
 
 void TweetReader::ReadFile(const std::string& path, Tweets& pos_tweets, Tweets& neg_tweets) {
@@ -47,8 +47,8 @@ void TweetReader::ReadFile(const std::string& path, Tweets& pos_tweets, Tweets& 
 				done = !read_row_helper(std::make_index_sequence<std::tuple_size<RowType>::value>{}, row, csv_reader);
 				if(!done) {
 					int target = std::get<4>(row);
-					std::unique_ptr<Tweet> tweet = fill_values(std::make_index_sequence<columns_num - 1>{}, row);
-					max_size_ = std::max(max_size_, tweet->size());
+					Tweet tweet = fill_values(std::make_index_sequence<columns_num - 1>{}, row);
+					max_size_ = std::max(max_size_, tweet.size());
 					if(target == 1)
 						pos_tweets.push_back(std::move(tweet));
 					else if(target == 0)

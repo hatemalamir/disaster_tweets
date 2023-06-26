@@ -111,6 +111,42 @@ void TrainModel(
 	std::cout << "Epoch: " << epoch << " | Loss: " << (epoch_loss / (batch_index - 1))  << " Accuracy: " << (epoch_acc / (batch_index - 1)) << std::endl;
 }
 
+void TrainModel(
+	int epoch,
+	SentimentRNN& model,
+	torch::data::StatelessDataLoader<TweetDataset, torch::data::samplers::RandomSampler>& test_loader
+) {
+	torch::NoGradGuard guard;
+	double epoch_loss = 0;
+	double epoch_acc = 0;
+	int batch_index = 0;
+	model->eval();
+
+	for(auto& batch: test_loader) {
+		torch::Tensor texts, lengths, labels;
+		torch::Tensor predictions = model->forward(texts.t(), lengths);
+		predictions.squeeze_(1);
+
+		torch::Tensor loss = torch::binary_cross_entropy_with_logits(
+			predictions,
+			labels,
+			{},
+			{},
+			at::Reduction::Mean
+		);
+
+		auto loss_value = static_cast<double>(loss.item<float>());
+		auto acc_value = static_cast<double>(BinaryAccuracy(predictions, labels));
+
+		epoch_loss += loss_value;
+		epoch_acc += acc_value;
+
+		++batch_index;
+	}
+
+	std::cout << "Epoch: " << epoch << " | Test Loss: " << (epoch_loss / batch_index) << " Test Acc: " << (epoch_acc / batch_index) << std::endl;
+}
+
 int main(int argc, char** argv) {
 	if(argc > 1) {
 		torch::DeviceType device = torch::cuda::is_available() ? torch::DeviceType::CUDA : torch::DeviceType::CPU;
@@ -119,6 +155,13 @@ int main(int argc, char** argv) {
 
 		TweetReader train_reader(train_path);
 		std::cout << ">>> Training dataset loaded! Read " << train_reader.GetPosSize() << " positive tweets, and " << train_reader.GetNegSize() << " negative tweets." << " Max tweet size: " << train_reader.GetMaxSize() << std::endl;
+		for(int i = 0; i < 5; i++) {
+			std::cout << "  Positive Tweet " << i + 1 << ". Original: " << train_reader.GetPos(i).GetOriginal() << ", clean: [";
+			std::vector<std::string> words = train_reader.GetPos(i).GetWords();
+			for(size_t i = 0; i < words.size(); i++)
+				std::cout << words.at(i) << ", ";
+			std::cout << "]" << std::endl;
+		}
 
 		WordsFrequencies words_frequencies;
 		GetWordsFrequencies(train_reader, words_frequencies);
@@ -173,7 +216,7 @@ int main(int argc, char** argv) {
 		int epochs = 100;
 		for(int epoch = 0; epoch < epochs; ++epoch) {
 			TrainModel(epoch, model, optimizer, *train_loader);
-			// TestModel();
+			// TestModel(epoch, model, *test_loader);
 		}
 
 		return 0;

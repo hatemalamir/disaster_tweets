@@ -8,7 +8,7 @@
 
 class TweetReader {
 private:
-	using Tweets = std::vector<std::unique_ptr<Tweet> >;
+	using Tweets = std::vector<Tweet>;
 	Tweets pos_samples_;
 	Tweets neg_samples_;
 	size_t pos_size_ = 0;
@@ -22,8 +22,8 @@ public:
 	size_t GetPosSize() const {return pos_size_;}
 	size_t GetNegSize() const {return neg_size_;}
 	size_t GetMaxSize() const {return max_size_;}
-	const Tweet& GetPos(size_t index) const {return *pos_samples_.at(index);}
-	const Tweet& GetNeg(size_t index) const {return *neg_samples_.at(index);}
+	const Tweet& GetPos(size_t index) const {return pos_samples_[index];}
+	const Tweet& GetNeg(size_t index) const {return neg_samples_[index];}
 };
 
 using WordsFrequencies = std::unordered_map<std::string, size_t>;
