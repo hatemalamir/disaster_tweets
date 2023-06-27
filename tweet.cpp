@@ -4,8 +4,27 @@ const std::regex Tweet::link{R"(https?://\S+)"};
 const std::regex Tweet::hash{R"(#)"};
 const std::regex Tweet::stock{R"(\$[_[:alnum:]]\S*)"};
 const std::regex Tweet::rt{R"(^RT\s+)"};
-const	std::regex Tweet::alnum{R"([\w|\s]*)"};
+const	std::regex Tweet::alnum{R"([\w|\s|']*)"};
 const std::regex Tweet::token{R"([\s|,]+)"};
+
+std::vector<std::string> &Tweet::stopwords() {
+	static std::vector<std::string> st_ws;
+	if(st_ws.empty()) {
+		const std::string stopwords_file = "../data/stop_words_english.txt";
+		std::cout << std::endl << ">>> Initializing stopwords from " << stopwords_file << std::endl;
+		std::ifstream ifs;
+		ifs.open(stopwords_file, std::ios_base::in);
+		if(!ifs) {
+			throw std::invalid_argument("Failed to open stopwords file " + stopwords_file);
+		}
+		std::string ssw;
+		ifs >> ssw;
+		std::sregex_token_iterator swit{ssw.begin(), ssw.end(), token, -1};
+		std::vector<std::string> st_ws_temp{swit, {}};
+		st_ws = st_ws_temp;
+	}
+	return st_ws;
+}
 
 std::string Tweet::clean(const std::string text) {
 	std::string clean_text = std::regex_replace(text, Tweet::link, "");
@@ -13,6 +32,8 @@ std::string Tweet::clean(const std::string text) {
 	clean_text = std::regex_replace(clean_text, stock, "");
 	clean_text = std::regex_replace(clean_text, rt, "");
 	clean_text = regex_replace(clean_text, alnum, "$&", std::regex_constants::format_no_copy);
+	for(size_t i = 0; i < clean_text.size(); i++)
+		clean_text[i] = tolower(clean_text[i]);
 
 	return clean_text;
 }
@@ -26,7 +47,7 @@ std::vector<std::string> Tweet::tokenize(const std::string text) {
 			tokenized.begin(),
 			tokenized.end(),
 			[](std::string const& s){
-				return s.size() == 0;
+				return s.size() == 0 || std::find(stopwords().begin(), stopwords().end(), s) != stopwords().end();
 			}),
 		tokenized.end()
 	);

@@ -5,6 +5,7 @@
 #include <vector>
 #include <regex>
 #include <iostream>
+#include <fstream>
 
 class Tweet {
 	private:
@@ -14,6 +15,9 @@ class Tweet {
 		const static std::regex rt;
 		const	static std::regex alnum;
 		const static std::regex token;
+		const static std::string stopwords_file;
+		// const static std::vector<std::string> stopwords;
+		static std::vector<std::string> &stopwords();
 
 		int id;
 		std::string keyword;
@@ -32,6 +36,8 @@ class Tweet {
 		size_t size() const {return clean_text.size();}
 		const std::string& GetOriginal() const {return text;}
 		const std::vector<std::string>& GetWords() const {return clean_text;}
+
+	private:
 };
 
 #endif // TWEET_H
