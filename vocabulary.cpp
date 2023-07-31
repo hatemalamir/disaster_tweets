@@ -7,8 +7,7 @@ Vocabulary::Vocabulary(const WordsFrequencies& words_frequencies, const GloveRea
 	unk_index_ = 0;
 	pad_index_ = unk_index_ + 1;
 
-	embeddings_.push_back(glove_reader.GetUnknown()); //unknown
-	embeddings_.push_back(glove_reader.GetUnknown()); //padding
+	embeddings_.push_back(glove_reader.GetUnknown());
 	
 	size_t index = pad_index_ + 1;
 	for(auto& wf: words_frequencies) {

@@ -165,14 +165,18 @@ int main(int argc, char** argv) {
 
 		WordsFrequencies words_frequencies;
 		GetWordsFrequencies(train_reader, words_frequencies);
-		int64_t vocab_size = 25000;
-		std::cout << ">>> Keeping the " << vocab_size << " most frequent words" << std::endl;
+		std::cout << ">>> Counted the frequencies of " << words_frequencies.size() << " words" << std::endl;
+		int64_t vocab_size = 10000;
 		SelectTopFrequencies(words_frequencies, vocab_size);
+		std::cout << ">>> Limited the vocabulary to " << vocab_size << " words" << std::endl;
 
 		int64_t embedding_dim = 200;
+		std::cout << ">>> Loading Glove embeddings ..." << std::endl;
 		GloveReader glove_reader(argv[2], embedding_dim);
+		std::cout << "<<< Glove embeddings loaded" << std::endl;
+		std::cout << ">>> Building vocabulary ..." << std::endl;
 		Vocabulary vocab(words_frequencies, glove_reader);
-		std::cout << ">>> Added " << vocab.GetEmbeddingsCount() << " words with embeddings to the vocabulary" << std::endl;
+		std::cout << "<<< Added " << vocab.GetEmbeddingsCount() << " words with embeddings to the vocabulary" << std::endl;
 
 		TweetDataset train_dataset(&train_reader, &vocab, device);
 		size_t batch_size = 32;

@@ -11,7 +11,6 @@ std::vector<std::string> &Tweet::stopwords() {
 	static std::vector<std::string> st_ws;
 	if(st_ws.empty()) {
 		const std::string stopwords_file = "../data/stop_words_english.txt";
-		std::cout << std::endl << ">>> Initializing stopwords from " << stopwords_file << std::endl;
 		std::ifstream ifs;
 		ifs.open(stopwords_file, std::ios_base::in);
 		if(!ifs) {

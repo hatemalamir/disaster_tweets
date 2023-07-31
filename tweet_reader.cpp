@@ -100,9 +100,10 @@ void SelectTopFrequencies(WordsFrequencies& vocab, int64_t new_size) {
 	std::cout << ">>> Top 20 words:" << std::endl;
 	for(auto& item: freq_items) {
 		new_vocab.insert({item.second->first, item.first});
-		if(pi < 20)
+		if(pi < 20) {
 			std::cout << "  " << item.second->first << ": " << item.first << std::endl;
-		pi++;
+			pi++;
+		}
 	}
 	vocab = new_vocab;
 }
