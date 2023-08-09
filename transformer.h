@@ -9,13 +9,21 @@ class AttentionHead : public torch::nn::Module {
 		torch::nn::Linear k = nullptr;
 		torch::nn::Linear v = nullptr;
 
-		at::Tensor scaled_dot_product_attention(at::Tensor& query, at::Tensor& key, at::Tensor& value);
+		torch::Tensor scaled_dot_product_attention(torch::Tensor& query, torch::Tensor& key, torch::Tensor& value);
 	public:
 		AttentionHead(int64_t embed_dim, int64_t head_dim);
-		at::Tensor forward(at::Tensor hidden_state);
+		torch::Tensor forward(torch::Tensor &hidden_state);
 };
 
 class MultiHeadAttention : public torch::nn::Module {
+	private:
+		int64_t embed_dim;
+		int64_t num_heads;
+		torch::nn::ModuleList heads = nullptr;
+		torch::nn::Linear output_linear = nullptr;
+	public:
+		MultiHeadAttention(int64_t embed_dim, int64_t num_heads);
+		torch::Tensor forward(torch::Tensor &hidden_state);
 };
 
 #endif //TRANSFORMER.h
